@@ -6,7 +6,7 @@ export default function Container(props: {
 }) {
   return (
     <div className="container mx-auto">
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen p-10 ">
         {props.left}
         {props.right}
       </div>

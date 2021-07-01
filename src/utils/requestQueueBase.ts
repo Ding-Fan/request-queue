@@ -7,13 +7,10 @@
 
 export abstract class RequestQueueBase {
   constructor(
-    protected theQueue: Array<myLib.RequestWithId>,
-    protected counter: number,
-    protected id: number
+    protected theQueue: Array<MyLib.RequestWithId> = [],
+    protected counter: number = 0,
+    protected id: number = 0
   ) {
-    theQueue = []
-    counter = 0
-    id = 0
   }
   /**
    * Adds an asynchronous request to the end of the queue.
@@ -23,7 +20,7 @@ export abstract class RequestQueueBase {
    * @returns {number} - An ID for the enqueued request.
    */
   abstract enqueue(
-    request: myLib.Request,
+    request: MyLib.Request,
     onExecuted?: Function
   ): number
 
@@ -70,5 +67,9 @@ export abstract class RequestQueueBase {
    */
   protected increaseId() {
     this.id = this.id + 1
+  }
+
+  get getQueue() {
+    return this.theQueue
   }
 }

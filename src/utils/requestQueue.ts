@@ -5,29 +5,58 @@ export class RequestQueue extends RequestQueueBase {
     request: () => Promise<any>,
     onExecuted?: Function
   ): number {
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+    // https://dom.spec.whatwg.org/#interface-AbortSignal
+    let theController = new AbortController()
+    let signal = theController.signal
     const processRequest = async () => {
-      try {
-        const result = await request()
-        if (onExecuted) {
-          onExecuted(result)
+      return new Promise(async (resolve, reject) => {
+
+        // https://dom.spec.whatwg.org/#abortcontroller-api-integration
+        // rejecting the promise with an "AbortError" DOMException
+        const error = new DOMException('abort request', 'AbortError')
+
+        if (signal.aborted) {
+          return reject(error)
         }
-      } catch (error) {
-        console.error(error)
-      }
+
+        signal.addEventListener('abort', () => {
+          reject(error)
+        })
+
+        try {
+          const result = await request()
+
+          if (onExecuted) {
+            onExecuted(result)
+          }
+
+          resolve(result)
+        } catch (requestError) {
+          console.error(requestError)
+        }
+      })
     }
 
+    this.increaseId()
     this.theQueue.push({
       request: processRequest,
+      controller: theController,
       id: this.id
     })
     this.increaseCounter()
-    this.increaseId()
 
     return this.id
   }
   cancel(id: number): void {
-    this.theQueue = this.theQueue.filter(i => i.id === id)
-    this.decreaseCounter()
+    const theRequestId = this.theQueue.findIndex(i => i.id === id)
+    console.log('theQueue', this.theQueue)
+    console.log('theRequestId', theRequestId)
+    console.log('id', id)
+
+
+    this.theQueue[theRequestId].controller.abort()
   }
   async processNext(): Promise<void> {
 
