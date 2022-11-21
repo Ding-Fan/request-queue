@@ -11,7 +11,6 @@ import {
 } from "../state/index";
 
 export default function Dropdown() {
-
   const [text] = useAtom(textAtom);
   const [, setAddRecord] = useAtom(addRecordAtom);
   const [, setRemoveRecord] = useAtom(removeRecordAtom);
